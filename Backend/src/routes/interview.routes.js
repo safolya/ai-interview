@@ -12,5 +12,18 @@ const router=Router();
   
    router.post("/",authMiddleware,upload.single("resume"),interviewController.generateInterviewReport);
 
+   /**
+    * @route GET /api/interview/report/interviewId
+    * @desc Get the interview report for a specific interview ID
+    * @access Private (Requires authentication)
+    */
+   router.get("/report/:interviewId",authMiddleware,interviewController.getInterviewReport);
+
+   /**
+    * @route GET /api/interview/
+    * @desc Get all interview reports for the authenticated user
+    * @access Private (Requires authentication)
+    */
+    router.get("/",authMiddleware,interviewController.getAllInterviewReports);
 
 module.exports=router;
