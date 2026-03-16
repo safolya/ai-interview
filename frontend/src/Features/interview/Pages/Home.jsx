@@ -1,10 +1,36 @@
 
 import "../styles/home.scss"
+import { useState,useRef } from "react"
+import {useInterview} from "../hooks/useInterview"
+import { useNavigate } from "react-router";
 
 
 const Home = () => {
 
+  const {loading,genrateReport} = useInterview();
+  const [jobDescription, setJobDescription] = useState("");
+  const [selfDescription, setSelfDescription] = useState("");
+  const resumseInputRef=useRef(null);
 
+  const navigate=useNavigate();
+
+  const handleGenerate=async()=>{
+    const resume=resumseInputRef.current.files[0];
+    const data=await genrateReport({jobDescription,selfDescription,resume});
+    navigate(`/interview/${data._id}`);
+  }
+
+  if(loading){
+    return (
+      <div className="loading-screen">
+        <div className="spinner">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="6" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="4.93" y1="4.93" x2="7.76" y2="7.76" /><line x1="16.24" y1="16.24" x2="19.07" y2="19.07" /><line x1="2" y1="12" x2="6"
+            y2="12" /><line x1="18" y1="12" x2="22" y2="12" /><line x1="4.93" y1="19.07" x2="7.76" y2="16.24" /><line x1="16.24" y1="7.76" x2="19.07" y2="4.93" /></svg>
+        </div>
+        <h2>Generating your personalized interview strategy...</h2>
+      </div>
+    )
+  }
 
 
   return (
@@ -30,7 +56,7 @@ const Home = () => {
               <span className='badge badge--required'>Required</span>
             </div>
             <textarea
-
+              onChange={(e)=>{setJobDescription(e.target.value)}}
               className='panel__textarea'
               placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
               maxLength={5000}
@@ -62,7 +88,7 @@ const Home = () => {
                 </span>
                 <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
                 <p className='dropzone__subtitle'>PDF or DOCX (Max 5MB)</p>
-                <input hidden type='file' id='resume' name='resume' accept='.pdf,.docx' />
+                <input ref={resumseInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,.docx' />
               </label>
             </div>
 
@@ -73,7 +99,7 @@ const Home = () => {
             <div className='self-description'>
               <label className='section-label' htmlFor='selfDescription'>Quick Self-Description</label>
               <textarea
-
+                onChange={(e)=>{setSelfDescription(e.target.value)}}
                 id='selfDescription'
                 name='selfDescription'
                 className='panel__textarea panel__textarea--short'
@@ -95,7 +121,7 @@ const Home = () => {
         <div className='interview-card__footer'>
           <span className='footer-info'>AI-Powered Strategy Generation &bull; Approx 30s</span>
           <button
-
+            onClick={handleGenerate}
             className='generate-btn'>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
             Generate My Interview Strategy

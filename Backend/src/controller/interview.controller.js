@@ -51,13 +51,19 @@ const generateInterviewReport=async(req,res)=>{
     try {
         const resume=req.file;
         const reusmeContent=await (new pdfParse.PDFParse(Uint8Array.from(resume.buffer))).getText();
+        // const reusmeContent = await pdfParse(resume.buffer);
+        console.log(reusmeContent.text);
         const {jobDescription,selfDescription}=req.body;
+
+        console.log(interviewGenerateSchema);
 
         const interviewReport=await interviewGenerateSchema({
             resume:reusmeContent.text,
             jobDescription,
             selfDescription
         })
+
+        console.log(interviewReport);
          
         const newInterviewReport=await interviewReportModel.create({
             user:req.user._id,

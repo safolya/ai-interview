@@ -1,6 +1,6 @@
 const { GoogleGenAI } = require('@google/genai');
-const {z} = require('zod');
-const {zodToJsonSchema} = require('zod-to-json-schema');
+const { z } = require('zod');
+const { zodToJsonSchema } = require('zod-to-json-schema');
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY,
@@ -21,35 +21,59 @@ const interviewReportSchema = z.object({
     })).describe("Behavioral questions that can be asked in the interview, along with the intention behind asking those questions"),
     skillGaps: z.array(z.object({
         skill: z.string().describe("The skill in which the candidate is lacking"),
-        severity: z.enum([ "low", "medium", "high" ]).describe("The severity of the skill gap")
+        severity: z.enum(["low", "medium", "high"]).describe("The severity of the skill gap")
     })).describe("The skill gaps of the candidate that can be worked upon to improve the chances of cracking the interview"),
     preparationPlan: z.array(z.object({
         day: z.number().describe("The day number of the preparation plan"),
         focus: z.string().describe("The focus of the preparation for that day"),
         tasks: z.array(z.string()).describe("The tasks to be performed on that day to prepare for the interview")
     })).describe("A day-wise preparation plan for the candidate to crack the interview"),
-    title: z.string().describe("The title of the interview report, can be used as the file name when downloading the report")
+    title: z.string().describe("The title of the job for which the interview report is generated")
 })
 
 
-async function interviewGenerateSchema({resume,jobDescription,selfDescription}){
+const interviewGenerateSchema = async ({ resume, jobDescription, selfDescription }) => {
 
-    const prompt=`Generate an interview report for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}`;
+    // const prompt=`Generate an interview report for a candidate with the following details:
+    //                     Resume: ${resume}
+    //                     Self Description: ${selfDescription}
+    //                     Job Description: ${jobDescription}`;
+    const prompt = `
+Generate an interview report following EXACTLY this structure:
+  Resume=${resume}
+  Job Description=${jobDescription}
+  Self Description=${selfDescription}
+{
+ matchScore: number (0-100),
+ technicalQuestions: [
+   { question, intention, answer }
+ ],
+ behavioralQuestions: [
+   { question, intention, answer }
+ ],
+ skillGaps: [
+   { skill, severity: low | medium | high }
+ ],
+ preparationPlan: [
+   { day, focus, tasks[] }
+ ],
+ title: string
+}
 
-    const response=await ai.models.generateContent({
-        model:"gemini-3-flash-preview",
-        contents:prompt,
-        config:{
-            responseMimeType:"application/json",
+Return ONLY JSON.
+`;
+
+    const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
             responseSchema: zodToJsonSchema(interviewReportSchema)
         }
     })
-    return(JSON.parse(response.text))
+    return (JSON.parse(response.text))
 }
 
 
 
-module.exports=interviewGenerateSchema;
+module.exports = { interviewGenerateSchema };
