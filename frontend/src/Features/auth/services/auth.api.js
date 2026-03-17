@@ -25,6 +25,7 @@ export async function login ({email,password}){
             email,password
         })
 
+
         return response.data;
 
     } catch (error) {
@@ -46,7 +47,7 @@ export async function logout(){
 export async function get_me(){
     try {
         const response=await api.get("/api/auth/get-me")
-
+         console.log(response);
          return response.data;
 
     } catch (error) {

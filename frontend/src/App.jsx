@@ -6,11 +6,11 @@ function App() {
 
 
   return (
-     <AuthProvider>
+    <AuthProvider>
       <InterviewProvider>
-       <RouterProvider router={router}/>
+        <RouterProvider router={router} />
       </InterviewProvider>
-     </AuthProvider>
+    </AuthProvider>
   )
 }
 

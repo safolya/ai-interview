@@ -39,28 +39,73 @@ const interviewGenerateSchema = async ({ resume, jobDescription, selfDescription
     //                     Self Description: ${selfDescription}
     //                     Job Description: ${jobDescription}`;
     const prompt = `
-Generate an interview report following EXACTLY this structure:
-  Resume=${resume}
-  Job Description=${jobDescription}
-  Self Description=${selfDescription}
+You are a strict JSON generator.
+
+Return ONLY valid JSON.
+Do NOT include any explanation.
+Do NOT flatten objects.
+Do NOT convert objects into arrays.
+Do NOT return key-value sequences.
+
+CRITICAL:
+- Arrays MUST contain OBJECTS
+- Each object must have proper key:value pairs
+- NEVER return strings like "question", "answer" separately
+
+WRONG FORMAT (DO NOT DO THIS):
+["question", "What is Node.js?", "answer", "Runtime"]
+
+CORRECT FORMAT:
+[
+  {
+    "question": "What is Node.js?",
+    "intention": "Check understanding",
+    "answer": "Node.js is a runtime..."
+  }
+]
+
+Follow this EXACT schema:
+
 {
- matchScore: number (0-100),
- technicalQuestions: [
-   { question, intention, answer }
- ],
- behavioralQuestions: [
-   { question, intention, answer }
- ],
- skillGaps: [
-   { skill, severity: low | medium | high }
- ],
- preparationPlan: [
-   { day, focus, tasks[] }
- ],
- title: string
+  "matchScore": number,
+  "technicalQuestions": [
+    {
+      "question": string,
+      "intention": string,
+      "answer": string
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": string,
+      "intention": string,
+      "answer": string
+    }
+  ],
+  "skillGaps": [
+    {
+      "skill": string,
+      "severity": "low" | "medium" | "high"
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": number,
+      "focus": string,
+      "tasks": [string]
+    }
+  ],
+  "title": string
 }
 
-Return ONLY JSON.
+Resume:
+${resume}
+
+Self Description:
+${selfDescription}
+
+Job Description:
+${jobDescription}
 `;
 
     const response = await ai.models.generateContent({
@@ -76,4 +121,4 @@ Return ONLY JSON.
 
 
 
-module.exports = { interviewGenerateSchema };
+module.exports = { interviewGenerateSchema,interviewReportSchema };

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 
 const Home = () => {
 
-  const {loading,genrateReport} = useInterview();
+  const {loading,genrateReport,reports} = useInterview();
   const [jobDescription, setJobDescription] = useState("");
   const [selfDescription, setSelfDescription] = useState("");
   const resumseInputRef=useRef(null);
@@ -128,6 +128,18 @@ const Home = () => {
           </button>
         </div>
       </div>
+
+      {reports.length > 0 && (
+        <div className='reports-section'>
+          <h3>Generated Reports</h3>
+          <ul>
+            {reports.map((report, index) => (
+              <li key={index}>{report}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
 
       {/* Page Footer */}
       <footer className='page-footer'>
