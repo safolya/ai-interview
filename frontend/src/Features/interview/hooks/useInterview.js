@@ -1,10 +1,11 @@
 import {generateInterviewReport,getAllInterviewReports,getInterviewReport} from "../Services/interview.api"
-import { useContext } from "react";
+import { useContext,useEffect } from "react";
 import { InterviewContext } from "../interview.context";
-
+import { useParams } from "react-router";
 
 export const useInterview=()=>{
     const {loading,setLoading,report,setReport,reports,setReports}=useContext(InterviewContext);
+    const { interviewId } = useParams()
 
     const genrateReport=async({resume,jobDescription,selfDescription})=>{
         setLoading(true);
@@ -41,6 +42,7 @@ export const useInterview=()=>{
         let response=null;
         try {
             response=await getAllInterviewReports();
+            console.log(response.interviewReports);
             setReports(response.interviewReports);
         } catch (error) {
             console.log(error);
@@ -49,6 +51,15 @@ export const useInterview=()=>{
         }
         return response.interviewReports;
     }
+
+      useEffect(() => {
+        if (interviewId) {
+            getReportbyId(interviewId)
+        } else {
+            getAllReports()
+        }
+    }, [ interviewId ])
+
 
     return {loading,report,reports,genrateReport,getReportbyId,getAllReports};
 }

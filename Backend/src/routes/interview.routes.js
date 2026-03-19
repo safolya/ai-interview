@@ -26,4 +26,12 @@ const router=Router();
     */
     router.get("/",authMiddleware,interviewController.getAllInterviewReports);
 
+    /**
+     * @route POST /api/interview/resume/pdf/:interviewReportId
+     * @desc Generate a resume PDF based on the resume content, self description and job description provided by the candidate
+     * @access Private (Requires authentication)
+     */
+
+    router.post("/resume/pdf/:interviewReportId",authMiddleware,interviewController.generateResumePdfController);
+
 module.exports=router;

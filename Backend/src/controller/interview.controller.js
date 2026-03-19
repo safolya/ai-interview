@@ -1,5 +1,5 @@
 const pdfParse = require("pdf-parse");
-const { interviewGenerateSchema,interviewReportSchema } = require("../services/ai.services");
+const { interviewGenerateSchema,interviewReportSchema,generateResumePdf } = require("../services/ai.services");
 const interviewReportModel = require("../model/interview");
 const {normalizeArray,sanitizeData} = require("../utils/ai.Normalize")
 
@@ -13,7 +13,7 @@ const getInterviewReport = async (req, res) => {
     try {
 
         const { interviewId } = req.params;
-        const interviewReport = await interviewReportModel.findOne({ _id: interviewId, user: req.user._id });
+        const interviewReport = await interviewReportModel.findOne({ _id: interviewId, user: req.user.id });
 
         if (!interviewReport) {
             return res.status(404).json({ message: "Interview report not found" });
@@ -33,13 +33,22 @@ const getInterviewReport = async (req, res) => {
 
 const getAllInterviewReports = async (req, res) => {
     try {
-        const interviewReports = await interviewReportModel.find({ user: req.user._id }).sort({ createdAt: -1 }).select("-resume,-selfDescription,-jobDescription,-__v,-technicalQuestions,-behavioralQuestions,-skillGaps,-preparationPlan");
+        const interviewReports = await interviewReportModel.find({ user: req.user.id }).sort({ createdAt: -1 }).select("-resume -selfDescription -jobDescription -__v -technicalQuestions -behavioralQuestions -skillGaps -preparationPlan");
         res.status(200).json({ interviewReports });
     } catch (error) {
         console.error("Error fetching interview report:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+// async function getAllInterviewReportsController(req, res) {
+//     const interviewReports = await interviewReportModel.find({ user: req.user.id }).sort({ createdAt: -1 }).select("-resume -selfDescription -jobDescription -__v -technicalQuestions -behavioralQuestions -skillGaps -preparationPlan")
+
+//     res.status(200).json({
+//         message: "Interview reports fetched successfully.",
+//         interviewReports
+//     })
+// }
 
 
 
@@ -84,8 +93,9 @@ const generateInterviewReport = async (req, res) => {
             });
         }
 
+
         const newInterviewReport = await interviewReportModel.create({
-            user: req.user._id,
+            user: req.user.id,
             resume: reusmeContent.text,
             jobDescription,
             selfDescription,
@@ -100,7 +110,39 @@ const generateInterviewReport = async (req, res) => {
     }
 }
 
+/**
+ * @desc Function to generate resume pdf from the resume content , self description and job description provided by the candidate
+ * This function uses the generateResumePdf function from the ai.services to generate a resume in HTML format and then converts it to PDF using puppeteer
+ * The generated PDF buffer is then returned as a response with the appropriate headers for downloading the file
+ * 
+ * @param {Object} req - Express request object containing the resume content, self description and job description in the body
+ * @param {Object} res - Express response object used to send the generated PDF file as a response
+ * @returns {Buffer} - The generated resume PDF buffer
+ */
+
+  const generateResumePdfController=async(req,res)=>{
+    try {
+        const{interviewReportId}=req.params;
+        const interviewReport=await interviewReportModel.findOne({_id:interviewReportId,user:req.user.id});
+
+        if(!interviewReport){
+            return res.status(404).json({message:"Interview report not found"});
+        }
+
+        const{resume,selfDescription,jobDescription}=interviewReport;
+
+        const pdfBuffer=await generateResumePdf({resume,selfDescription,jobDescription});
+
+        res.set({
+            "Content-Type":"application/pdf",
+            "Content-Disposition":`attachment; filename="${interviewReport.title.replace(/\s+/g,"_")}_Resume.pdf"`
+        })
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error("Error generating resume PDF:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+  }
 
 
-
-module.exports = { getInterviewReport, generateInterviewReport, getAllInterviewReports };
+module.exports = { getInterviewReport, generateInterviewReport, getAllInterviewReports, generateResumePdfController };

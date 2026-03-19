@@ -59,12 +59,13 @@ const RoadMapDay = ({ day }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
   const [activeNav, setActiveNav] = useState('technical')
-  const { report, getReportbyId, loading, getResumePdf } = useInterview()
+  // eslint-disable-next-line no-unused-vars
+  const { report, getReportbyId, loading, getResumePdf,getAllReports } = useInterview()
   const { interviewId } = useParams()
 
   useEffect(() => {
     if (interviewId) {
-      getReportbyId(interviewId)
+      getReportbyId(interviewId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interviewId])
