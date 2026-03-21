@@ -55,3 +55,21 @@ export const getAllInterviewReports=async()=>{
         console.log(error);
     }       
 }
+
+/**
+ * @desc Service function for generating a resume PDF based on the resume content, self description and job description by making an API call to the backend
+ * @param {string} interviewReportId - The ID of the interview report for which to generate the resume PDF
+ * @param {object} data - An object containing the resume content, self description and job description
+ * @returns {object} - The generated resume PDF data returned from the backend
+ */
+
+export const generateResumePdf=async(interviewReportId)=>{
+    try {
+        const response=await api.post(`api/interview/resume/pdf/${interviewReportId}`,null,{
+            responseType: 'blob',
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}

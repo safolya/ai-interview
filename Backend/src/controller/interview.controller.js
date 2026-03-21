@@ -135,9 +135,10 @@ const generateInterviewReport = async (req, res) => {
 
         res.set({
             "Content-Type":"application/pdf",
-            "Content-Disposition":`attachment; filename="${interviewReport.title.replace(/\s+/g,"_")}_Resume.pdf"`
+            "Content-Disposition":`attachment; filename="${interviewReport.title.replace(/\s+/g,"_")}_Resume.pdf"`,
+            "Content-Length": pdfBuffer.length
         })
-        res.send(pdfBuffer);
+        res.end(pdfBuffer);
     } catch (error) {
         console.error("Error generating resume PDF:", error);
         res.status(500).json({ message: "Internal server error" });

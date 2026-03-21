@@ -55,7 +55,7 @@ const Home = () => {
               <h2>Target Job Description</h2>
               <span className='badge badge--required'>Required</span>
             </div>
-            <textarea
+            <textarea required
               onChange={(e) => { setJobDescription(e.target.value) }}
               className='panel__textarea'
               placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
@@ -88,7 +88,7 @@ const Home = () => {
                 </span>
                 <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
                 <p className='dropzone__subtitle'>PDF or DOCX (Max 5MB)</p>
-                <input ref={resumseInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,.docx' />
+                <input required ref={resumseInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,.docx' />
               </label>
             </div>
 
@@ -98,7 +98,7 @@ const Home = () => {
             {/* Quick Self-Description */}
             <div className='self-description'>
               <label className='section-label' htmlFor='selfDescription'>Quick Self-Description</label>
-              <textarea
+              <textarea required
                 onChange={(e) => { setSelfDescription(e.target.value) }}
                 id='selfDescription'
                 name='selfDescription'
